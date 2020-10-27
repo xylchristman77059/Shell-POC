@@ -18,9 +18,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import { Input } from "@material-ui/core";
-//import MenuIcon from '@material-ui/icons/Menu';
 
 // STYLES
 const useStyles = makeStyles((theme) => ({
@@ -36,9 +34,11 @@ const useStyles = makeStyles((theme) => ({
   appbar: {
     backgroundColor: 'rgb(255, 206, 0)',
     height: '150px',
+    display: 'flex',
+    justifyContent: 'center',
   },
   logo: {
-    height: '60px'
+    width: '100px'
   },
   upload: {
     margin: '40px'
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   filename: {
     paddingBottom: '30px'
   },
-  container: {
+  table: {
     maxHeight: '600px'
   }
 }));
@@ -184,6 +184,9 @@ function App() {
           <img src="shell-logo.jpg" alt="logo" className={classes.logo} />
         </Toolbar>
         */}
+        <div>
+          <img src="shell-logo.png" alt="logo" className={classes.logo} />
+        </div>
       </AppBar>
 
       <div className={classes.upload}>
@@ -207,7 +210,7 @@ function App() {
 
       { data.length !== 0 ? 
         <Paper className={classes.root}>
-          <TableContainer className={classes.container}>
+          <TableContainer className={classes.table}>
             <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead>
                 <TableRow>
