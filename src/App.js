@@ -15,7 +15,6 @@ import TableRow from '@material-ui/core/TableRow';
 
 // APP BAR
 import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { Input } from "@material-ui/core";
@@ -32,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '25px'
   },
   appbar: {
-    backgroundColor: 'rgb(255, 206, 0)',
+    //backgroundColor: 'rgb(255, 206, 0)',
     height: '150px',
     display: 'flex',
     justifyContent: 'center',
@@ -49,7 +48,10 @@ const useStyles = makeStyles((theme) => ({
   button: {
     width: '300px',
     borderRadius: '20px',
-    background: 'rgb(70, 70, 70)'
+    backgroundColor: 'rgb(70, 70, 70)',
+    '&:hover': {
+      backgroundColor: 'green'
+    }
   },
   filename: {
     paddingBottom: '30px'
@@ -109,7 +111,7 @@ function App() {
         const ws = wb.Sheets[wsname];
 
         /* Convert array of arrays */
-        const data = XLSX.utils.sheet_to_json(ws);
+        const data = XLSX.utils.sheet_to_json(ws, {raw: false, defval:""});
 
         resolve(data); 
       };
@@ -179,11 +181,6 @@ function App() {
     <div className="App">
 
       <AppBar position="static" className={classes.appbar}>
-        {/*
-        <Toolbar >
-          <img src="shell-logo.jpg" alt="logo" className={classes.logo} />
-        </Toolbar>
-        */}
         <div>
           <img src="shell-logo.png" alt="logo" className={classes.logo} />
         </div>
