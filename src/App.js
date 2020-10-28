@@ -2,6 +2,12 @@ import React, {useState} from "react";
 import './App.css';
 import * as XLSX from "xlsx";
 
+// APP BAR
+import AppBar from '@material-ui/core/AppBar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import { Input } from "@material-ui/core";
+
 // TABLE
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -12,12 +18,13 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 
-// APP BAR
-import AppBar from '@material-ui/core/AppBar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import { Input } from "@material-ui/core";
+// DATE PICKER
+import Grid from '@material-ui/core/Grid';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 
 // STYLES
 const useStyles = makeStyles((theme) => ({
@@ -58,6 +65,15 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     maxHeight: '600px'
+  },
+  sorting: {
+    background: 'beige',
+    padding: '20px'
+  },
+  sortingText: {
+    padding: '12px',
+    margin: '0'
+
   }
 }));
 
@@ -72,6 +88,11 @@ function App() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [order, setOrder] = useState("");
+  const [orderBy, setOrderBy] = useState("");
+
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
   // HANDLE FILE UPLOAD
   const handleFileUpload = (e) => {
@@ -176,6 +197,60 @@ function App() {
     setPage(0);
   };
 
+  // HANDLE SORT REQUEST (BY TABLE HEADER)
+  const createSortHandler = (header) => (event) => {
+    handleRequestSort(event, header);
+  };
+
+  // SET SORT STATES
+  const handleRequestSort = (event, header) => {   
+    const isAsc = orderBy === header && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(header);
+    console.log('SORT>>>', header, order, orderBy)
+  };
+
+  // DESCENDING COMPARATOR
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+  
+  // COMPARATOR
+  function getComparator(order, orderBy) {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  // SORT DATA
+  function sortData(array, comparator) {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  }
+
+  // START DATE PICKER
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+    console.log('STARTDATE>>> ', date, startDate)
+  };
+
+  // END DATE PICKER
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+    console.log('ENDDATE>>> ', date, endDate)
+  };
+
   // RENDER
   return (
     <div className="App">
@@ -207,24 +282,66 @@ function App() {
 
       { data.length !== 0 ? 
         <Paper className={classes.root}>
+
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <Grid container justify="center" className={classes.sorting}>
+              <KeyboardDatePicker
+                autoOk
+                variant="inline"
+                inputVariant="outlined"
+                label="FORECASE-START-DATE"
+                format="MM/dd/yyyy"
+                value={startDate}
+                InputAdornmentProps={{ position: "start" }}
+                onChange={date => handleStartDateChange(date)}
+              />
+              <Typography variant="overline" display="block" gutterBottom className={classes.sortingText}>
+                TO
+              </Typography>
+              <KeyboardDatePicker
+                autoOk
+                variant="inline"
+                inputVariant="outlined"
+                label="FORECASE-END-DATE"
+                format="MM/dd/yyyy"
+                value={endDate}
+                InputAdornmentProps={{ position: "start" }}
+                onChange={date => handleEndDateChange(date)}
+              />            
+            </Grid>         
+          </MuiPickersUtilsProvider>
+
           <TableContainer className={classes.table}>
             <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead>
                 <TableRow>
                   { 
-                    keys.map((key,i) => {
-                      return(
-                        <TableCell key={i}>
-                          {key.toUpperCase()}
+                    keys.map((header) => {                  
+                      return(         
+                        <TableCell 
+                          key={header}
+                          sortDirection={orderBy === header ? order : false}
+                        >
+                          <TableSortLabel
+                            active={orderBy === header}
+                            direction={orderBy === header ? order : 'asc'}
+                            onClick={(createSortHandler(header))}
+                          >
+                            { header.toUpperCase() }                  
+                          </TableSortLabel>
+                          {/*{header.toUpperCase()}*/}
                         </TableCell>
                       )
                     })
                   }
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 { 
-                  data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => {
+                  sortData(data, getComparator(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, i) => {
                     return (
                       <TableRow hover role="checkbox" tabIndex={-1} key={i}>
                         {
