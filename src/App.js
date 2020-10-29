@@ -2,14 +2,16 @@ import React, {useState} from "react";
 import './App.css';
 import * as XLSX from "xlsx";
 
-// APP BAR
+// STYLES
+import { makeStyles } from '@material-ui/core/styles';
+
+// APP BAR & FILE UPLOAD
 import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { Input } from "@material-ui/core";
 
 // TABLE
-import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -211,7 +213,7 @@ function App() {
   };
 
   // DESCENDING COMPARATOR
-  function descendingComparator(a, b, orderBy) {
+  const descendingComparator = (a, b, orderBy) => { 
     if (b[orderBy] < a[orderBy]) {
       return -1;
     }
@@ -222,14 +224,14 @@ function App() {
   }
   
   // COMPARATOR
-  function getComparator(order, orderBy) {
+  const getComparator = (order, orderBy) => {
     return order === 'desc'
       ? (a, b) => descendingComparator(a, b, orderBy)
       : (a, b) => -descendingComparator(a, b, orderBy);
   }
 
   // SORT DATA
-  function sortData(array, comparator) {
+  const sortData = (array, comparator)=>  {
     const stabilizedThis = array.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
       const order = comparator(a[0], b[0]);
