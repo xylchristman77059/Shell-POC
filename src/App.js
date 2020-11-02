@@ -5,11 +5,13 @@ import * as XLSX from "xlsx";
 // STYLES
 import { makeStyles } from '@material-ui/core/styles';
 
-// APP BAR & FILE UPLOAD
+// APP BAR
 import AppBar from '@material-ui/core/AppBar';
+
+// FILE UPLOAD
+import { Input } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { Input } from "@material-ui/core";
 
 // TABLE
 import Paper from '@material-ui/core/Paper';
@@ -21,12 +23,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-
-// DATE PICKER
-import Grid from '@material-ui/core/Grid';
-import 'date-fns';
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 
 // STYLES
 const useStyles = makeStyles((theme) => ({
@@ -46,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   logo: {
-    width: '100px'
+    width: '80px'
   },
   upload: {
     margin: '40px'
@@ -92,9 +88,6 @@ function App() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [order, setOrder] = useState("");
   const [orderBy, setOrderBy] = useState("");
-
-  const [startDate, setStartDate] = useState();
-  const [endDate, setEndDate] = useState();
 
   // HANDLE FILE UPLOAD
   const handleFileUpload = (e) => {
@@ -200,16 +193,16 @@ function App() {
   };
 
   // HANDLE SORT REQUEST (BY TABLE HEADER)
-  const createSortHandler = (header) => (event) => {
-    handleRequestSort(event, header);
+  const createSortHandler = (key) => (event) => {
+    handleRequestSort(event, key);
   };
 
   // SET SORT STATES
-  const handleRequestSort = (event, header) => {   
-    const isAsc = orderBy === header && order === 'asc';
+  const handleRequestSort = (event, key) => {   
+    const isAsc = orderBy === key && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(header);
-    console.log('SORT>>>', header, order, orderBy)
+    setOrderBy(key);
+    console.log('SORT>>>', key, order, orderBy)
   };
 
   // DESCENDING COMPARATOR
@@ -232,6 +225,7 @@ function App() {
 
   // SORT DATA
   const sortData = (array, comparator)=>  {
+    console.log('Comparator>>>', comparator)
     const stabilizedThis = array.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
       const order = comparator(a[0], b[0]);
@@ -240,18 +234,6 @@ function App() {
     });
     return stabilizedThis.map((el) => el[0]);
   }
-
-  // START DATE PICKER
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-    console.log('STARTDATE>>> ', date, startDate)
-  };
-
-  // END DATE PICKER
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-    console.log('ENDDATE>>> ', date, endDate)
-  };
 
   // RENDER
   return (
@@ -275,7 +257,7 @@ function App() {
           <Button variant="contained" color="primary" component="span" className={classes.button}>
             Upload File
           </Button>
-        </label>
+        </label>     
       </div>
 
       <Typography variant="h5" gutterBottom className={classes.filename}>
@@ -284,61 +266,30 @@ function App() {
 
       { data.length !== 0 ? 
         <Paper className={classes.root}>
-
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <Grid container justify="center" className={classes.sorting}>
-              <KeyboardDatePicker
-                autoOk
-                variant="inline"
-                inputVariant="outlined"
-                label="FORECASE-START-DATE"
-                format="MM/dd/yyyy"
-                value={startDate}
-                InputAdornmentProps={{ position: "start" }}
-                onChange={date => handleStartDateChange(date)}
-              />
-              <Typography variant="overline" display="block" gutterBottom className={classes.sortingText}>
-                TO
-              </Typography>
-              <KeyboardDatePicker
-                autoOk
-                variant="inline"
-                inputVariant="outlined"
-                label="FORECASE-END-DATE"
-                format="MM/dd/yyyy"
-                value={endDate}
-                InputAdornmentProps={{ position: "start" }}
-                onChange={date => handleEndDateChange(date)}
-              />            
-            </Grid>         
-          </MuiPickersUtilsProvider>
-
           <TableContainer className={classes.table}>
             <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead>
                 <TableRow>
                   { 
-                    keys.map((header) => {                  
+                    keys.map((key) => {                  
                       return(         
                         <TableCell 
-                          key={header}
-                          sortDirection={orderBy === header ? order : false}
+                          key={key}
+                          sortDirection={orderBy === key ? order : false}
                         >
                           <TableSortLabel
-                            active={orderBy === header}
-                            direction={orderBy === header ? order : 'asc'}
-                            onClick={(createSortHandler(header))}
+                            active={orderBy === key}
+                            direction={orderBy === key ? order : 'asc'}
+                            onClick={(createSortHandler(key))}
                           >
-                            { header.toUpperCase() }                  
+                            { key.toUpperCase() }                  
                           </TableSortLabel>
-                          {/*{header.toUpperCase()}*/}
                         </TableCell>
                       )
                     })
                   }
                 </TableRow>
               </TableHead>
-
               <TableBody>
                 { 
                   sortData(data, getComparator(order, orderBy))

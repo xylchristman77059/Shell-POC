@@ -68,3 +68,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### Packages Installed
+
+npm i --save react@latest
+npm i --save react-data-grid
+npm i --save react-data-grid-addons
+
+npm i —save xlsx
+pm i --save csvtojson
+
+npm i @material-ui/core
+npm i @material-ui/icons
+npm i @material-ui/data-grid
