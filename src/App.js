@@ -2,6 +2,10 @@ import React, {useState} from "react";
 import './App.css';
 import * as XLSX from "xlsx";
 
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+
 // STYLES
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -13,28 +17,19 @@ import { Input } from "@material-ui/core";
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
-// TABLE
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-
 // STYLES
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
+  /*
   paper: {
     padding: theme.spacing(10),
     textAlign: 'center',
     color: theme.palette.text.secondary,
     margin: '25px'
   },
+  */
   appbar: {
     //backgroundColor: 'rgb(255, 206, 0)',
     height: '150px',
@@ -61,17 +56,11 @@ const useStyles = makeStyles((theme) => ({
   filename: {
     paddingBottom: '30px'
   },
-  table: {
-    maxHeight: '600px'
-  },
-  sorting: {
-    background: 'beige',
-    padding: '20px'
-  },
-  sortingText: {
-    padding: '12px',
-    margin: '0'
-
+  toolbar: {
+    background: 'white',
+    height: '50px',
+    display: 'flex',
+    alignItems: 'center',
   }
 }));
 
@@ -84,12 +73,6 @@ function App() {
   const [filename, setFilename] = useState("");
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [order, setOrder] = useState("");
-  const [orderBy, setOrderBy] = useState("");
-
-  const [filters, setFilters] = useState({});
 
   // HANDLE FILE UPLOAD
   const handleFileUpload = (e) => {
@@ -112,7 +95,7 @@ function App() {
     }
   }
 
-  // READ EXCEL
+  // PARSE EXCEL
   const readExcel = (file) => {
     const promise = new Promise((resolve, reject) => {
 
@@ -140,15 +123,11 @@ function App() {
     });
 
     promise.then((data) => {
-      if(data && data!=="undefined") {
-        console.log("DATA >>>: ", data, Object.keys(data[0]));
-        setRows(data);
-        setColumns(Object.keys(data[0]));
-      }
+      setData(data);
     })
   }
 
-  // READ CSV
+  // PARSE CSV
   const readCSV = (file) => {
     
     const promise = new Promise((resolve, reject) => {
@@ -175,67 +154,42 @@ function App() {
     });
 
     promise.then((data) => {
-      if(data && data!=="undefined") {
-        console.log("DATA >>>: ", data, Object.keys(data[0]));
-        setRows(data);
-        setColumns(Object.keys(data[0]));
-      }
+      setData(data);
     })
   }
 
-  // HANDLE PAGE CHANGE
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  // SET DATA TO STATES
+  const setData = (data) => {
+    if(data && data!=="undefined") {
+      // rows
+      setRows(data);
 
-  // HANDLE ROWS PER PAGE CHANGE
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  // HANDLE SORT REQUEST (BY TABLE HEADER)
-  const createSortHandler = (key) => (event) => {
-    handleRequestSort(event, key);
-  };
-
-  // SET SORT STATES
-  const handleRequestSort = (event, key) => {   
-    const isAsc = orderBy === key && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(key);
-    console.log('SORT>>>', key, order, orderBy)
-  };
-
-  // DESCENDING COMPARATOR
-  const descendingComparator = (a, b, orderBy) => { 
-    if (b[orderBy] < a[orderBy]) {
-      return -1;
+      // columns (headers)
+      const keys = Object.keys(data[0]);
+      const columns = buildHeader(keys);
+      setColumns(columns);
     }
-    if (b[orderBy] > a[orderBy]) {
-      return 1;
-    }
-    return 0;
-  }
-  
-  // COMPARATOR
-  const getComparator = (order, orderBy) => {
-    return order === 'desc'
-      ? (a, b) => descendingComparator(a, b, orderBy)
-      : (a, b) => -descendingComparator(a, b, orderBy);
   }
 
-  // SORT DATA
-  const sortData = (array, comparator)=>  {
-    console.log('Comparator>>>', comparator)
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-      const order = comparator(a[0], b[0]);
-      if (order !== 0) return order;
-      return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-  }
+  // BUILD TABLE HEADER BY JSON KEYS
+  const buildHeader = (columns) => {
+    const headers = columns.map((column,i) => { 
+      const header = { 
+        "headerName": column, 
+        "field": column, 
+        "sortable": true, 
+        "filter": true,
+        "floatingFilter": true,
+        "editable": true,
+        "rowDrag": i===0 ? true : false,
+        "checkboxSelection": i===0 ? true : false,
+        // "rowGroup": i===0 ? true : false,
+      }
+      return header;
+    })
+    console.log('HEADER>>>', headers)
+    return headers;
+  };
 
   // RENDER
   return (
@@ -266,69 +220,19 @@ function App() {
         {filename}
       </Typography>
 
-      { rows.length !== 0 ? 
-        <Paper className={classes.root}>
-          <TableContainer className={classes.table}>
-            <Table stickyHeader aria-label="sticky table" size="small">
-              <TableHead>
-                <TableRow>
-                  { 
-                    columns.map((column) => {                  
-                      return(         
-                        <TableCell 
-                          key={column}
-                          sortDirection={orderBy === column ? order : false}
-                        >
-                          <TableSortLabel
-                            active={orderBy === column}
-                            direction={orderBy === column ? order : 'asc'}
-                            onClick={(createSortHandler(column))}
-                          >
-                            { column.toUpperCase() }                  
-                          </TableSortLabel>
-                        </TableCell>
-                      )
-                    })
-                  }
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                { 
-                  sortData(rows, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, i) => {
-                    return (
-                      <TableRow hover role="checkbox" tabIndex={-1} key={i}>
-                        {
-                          columns.map((column,j) => {
-                            return (
-                              <TableCell column={j} >
-                                {row[column]}
-                              </TableCell>
-                            );
-                          })
-                        }
-                      </TableRow>
-                    );
-                  })
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
-          />
-        </Paper>   
-      :
+      { rows.length !== 0 ?
+        <div className = "ag-theme-balham" style={{height: 600}}>
+            <AgGridReact 
+              columnDefs={columns}
+              rowData={rows}
+              rowSelection="multiple"
+              rowDragManaged="true"
+              animateRows="true"
+            />
+        </div>
+        :
         <div/>
       }
-    
     </div>
   );
 }

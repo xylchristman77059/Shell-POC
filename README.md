@@ -74,10 +74,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 npm i --save react@latest
 npm i --save react-data-grid
-npm i --save react-data-grid-addons
+npm i --save ag-grid-react
 
 npm i —save xlsx
-pm i --save csvtojson
+npm i --save csvtojson
 
 npm i @material-ui/core
 npm i @material-ui/icons

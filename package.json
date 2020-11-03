@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "ag-grid-community": "^24.1.0",
     "ag-grid-react": "^24.1.1",
     "csvtojson": "^2.0.10",
     "react": "^17.0.1",
