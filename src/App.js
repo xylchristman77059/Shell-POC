@@ -82,12 +82,14 @@ function App() {
 
   // STATES
   const [filename, setFilename] = useState("");
-  const [keys, setKeys] = useState([]);
-  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [order, setOrder] = useState("");
   const [orderBy, setOrderBy] = useState("");
+
+  const [filters, setFilters] = useState({});
 
   // HANDLE FILE UPLOAD
   const handleFileUpload = (e) => {
@@ -140,8 +142,8 @@ function App() {
     promise.then((data) => {
       if(data && data!=="undefined") {
         console.log("DATA >>>: ", data, Object.keys(data[0]));
-        setData(data);
-        setKeys(Object.keys(data[0]));
+        setRows(data);
+        setColumns(Object.keys(data[0]));
       }
     })
   }
@@ -175,8 +177,8 @@ function App() {
     promise.then((data) => {
       if(data && data!=="undefined") {
         console.log("DATA >>>: ", data, Object.keys(data[0]));
-        setData(data);
-        setKeys(Object.keys(data[0]));
+        setRows(data);
+        setColumns(Object.keys(data[0]));
       }
     })
   }
@@ -257,32 +259,32 @@ function App() {
           <Button variant="contained" color="primary" component="span" className={classes.button}>
             Upload File
           </Button>
-        </label>     
+        </label>
       </div>
 
       <Typography variant="h5" gutterBottom className={classes.filename}>
         {filename}
       </Typography>
 
-      { data.length !== 0 ? 
+      { rows.length !== 0 ? 
         <Paper className={classes.root}>
           <TableContainer className={classes.table}>
             <Table stickyHeader aria-label="sticky table" size="small">
               <TableHead>
                 <TableRow>
                   { 
-                    keys.map((key) => {                  
+                    columns.map((column) => {                  
                       return(         
                         <TableCell 
-                          key={key}
-                          sortDirection={orderBy === key ? order : false}
+                          key={column}
+                          sortDirection={orderBy === column ? order : false}
                         >
                           <TableSortLabel
-                            active={orderBy === key}
-                            direction={orderBy === key ? order : 'asc'}
-                            onClick={(createSortHandler(key))}
+                            active={orderBy === column}
+                            direction={orderBy === column ? order : 'asc'}
+                            onClick={(createSortHandler(column))}
                           >
-                            { key.toUpperCase() }                  
+                            { column.toUpperCase() }                  
                           </TableSortLabel>
                         </TableCell>
                       )
@@ -292,16 +294,16 @@ function App() {
               </TableHead>
               <TableBody>
                 { 
-                  sortData(data, getComparator(order, orderBy))
+                  sortData(rows, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, i) => {
                     return (
                       <TableRow hover role="checkbox" tabIndex={-1} key={i}>
                         {
-                          keys.map((key,j) => {
+                          columns.map((column,j) => {
                             return (
-                              <TableCell key={j} >
-                                {row[key]}
+                              <TableCell column={j} >
+                                {row[column]}
                               </TableCell>
                             );
                           })
@@ -316,7 +318,7 @@ function App() {
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
             component="div"
-            count={data.length}
+            count={rows.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onChangePage={handleChangePage}
