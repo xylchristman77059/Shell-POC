@@ -73,8 +73,14 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 ### Packages Installed
 
 npm i --save react@latest
+npm i --save react-search-field
 npm i --save react-data-grid
+
 npm i --save ag-grid-react
+npm i --save ag-grid-enterprise
+
+npm install --save @progress/kendo-react-grid @progress/kendo-data-query @progress/kendo-react-inputs @progress/kendo-react-intl @progress/kendo-react-dropdowns @progress/kendo-react-dateinputs @progress/kendo-drawing @progress/kendo-react-data-tools @progress/kendo-react-animation @progress/kendo-licensing @progress/kendo-react-dialogs
+npm install --save @progress/kendo-theme-default @progress/kendo-theme-material
 
 npm i —save xlsx
 npm i --save csvtojson
