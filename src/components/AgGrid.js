@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from "react";
 
-import { AgGridReact } from 'ag-grid-react';
+import { AgGridReact } from '@ag-grid-community/react';
 import { AllModules } from '@ag-grid-enterprise/all-modules';
 
 import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
@@ -82,11 +82,10 @@ const AgGrid = ( {theme, data} ) => {
         "enableRowGroup": true,
         "enablePivot": true,
         "enableValue": true,
-        //"menuTabs": ['generalMenuTab', 'filterMenuTab','columnsMenuTab']
     };
     //console.log('defaultCol>>>', defaultColDef);
 
-    // NEW COLUMNS DEFS (INCLUDE THE NEW COLUMN)
+    // NEW COLUMNS DEFS (INCLUDE THE CUSTOM COLUMN)
     const newColName = "$$$_SUM";
     const newColDef = {
         "headerName": newColName, 
@@ -96,7 +95,7 @@ const AgGrid = ( {theme, data} ) => {
     columnDefs.push(newColDef);
     console.log('columnDefs>>>', columnDefs);
 
-    // NEW ROWS (INCLUDE THE NEW COLUMN)
+    // NEW ROWS (INCLUDE THE COSTOM ROWS)
     const rowData = rows.map((row, i) => {
         const value = Number(row.VOLUME) + Number(row.VOLUME_FINISHED);
         return (
@@ -129,6 +128,7 @@ const AgGrid = ( {theme, data} ) => {
         gridApi.api.exportDataAsExcel(params);
     };
 
+    // FILTERING
     const saveFilterModel = () => {
         const savedFilterModel = gridApi.api.getFilterModel();
         var keys = Object.keys(savedFilterModel);
@@ -140,8 +140,7 @@ const AgGrid = ( {theme, data} ) => {
 
     const clearFilters = () => {
         console.log('Clear Filters', gridApi)
-        saveFilterModel();
-        // gridApi.api.SetFilterModule(null);
+        gridApi.api.SetFilterModule(null);
         // gridApi.api.clearFilters();
     }
 
@@ -175,7 +174,6 @@ const AgGrid = ( {theme, data} ) => {
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
                 rowData={rowData}
-                //rowData={rows}
                 onGridReady={onGridReady}
 
                 rowSelection="multiple"
