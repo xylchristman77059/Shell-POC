@@ -12,11 +12,12 @@ const styles = {
         display: 'flex',
         height: '40px',
         alignItems: "center",
-        background: "#b3b3b3"
+        background: "aliceblue",
+        border: 'solid 1px #bdc3c7',
     },
     btnGroup: {
         position: "absolute",
-        right: "40px"
+        right: "30px",
     }
 };
   

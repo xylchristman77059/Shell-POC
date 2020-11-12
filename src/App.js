@@ -6,7 +6,6 @@ import jsonData from './files/data.json'
 
 // COMPONENTS
 import AppBar from './components/AppBar';
-import UploadFile from './components/UploadFile';
 import ToolBar from './components/ToolBar';
 import AgGrid from './components/AgGrid';
 import KendoGrid from './components/KendoGrid';
@@ -21,10 +20,8 @@ const styles = {
 // MAIN APP
 function App() {
 
-  const fileUploadEnabled = false;
-
   // Used in FileUpload & Grids
-  const [data, setData] = useState( fileUploadEnabled ? [] : jsonData );
+  const [data, setData] = useState( jsonData );
   
   // Used in ToolBar.js
   const [grid, setGrid] = useState("ag");
@@ -37,10 +34,12 @@ function App() {
     }
   }
 
+  // Handle grid type changes
   const handleGridChange = (newGrid) => {
     setGrid(newGrid);
   }
 
+  // Handle theme changes
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
   }
@@ -49,19 +48,16 @@ function App() {
     <div className="App">
 
       <AppBar />
-
-      { fileUploadEnabled && 
-        <UploadFile handleFileData={handleFileData} /> 
-      }
+      <ToolBar 
+        grid={grid} 
+        theme={theme} 
+        handleGridChange = {handleGridChange}
+        handleThemeChange = {handleThemeChange}
+        handleFileData={handleFileData}
+      /> 
 
       { data.length !== 0 ?
-        <div style={styles.grid}>
-          <ToolBar 
-            grid={grid} 
-            theme={theme} 
-            handleGridChange = {handleGridChange}
-            handleThemeChange = {handleThemeChange}
-          />    
+        <div style={styles.grid}>           
           {
             grid === "ag" ?  <AgGrid theme={theme} data={data} />
             :

@@ -1,5 +1,6 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
+import UploadFile from './UploadFile';
 
 const styles = {
     toolbar: {
@@ -9,12 +10,13 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         borderRadius: 0,
-    }
+    },
 };
   
-const ToolBar = ({grid, theme, handleGridChange, handleThemeChange}) => {    
+const ToolBar = ({grid, theme, handleGridChange, handleThemeChange, handleFileData}) => {    
 	return (
 		<Paper style={styles.toolbar}>
+
             <select
               value={grid}
               onChange={(e)=>{ handleGridChange(e.target.value) }}
@@ -37,6 +39,9 @@ const ToolBar = ({grid, theme, handleGridChange, handleThemeChange}) => {
               :
                 <div/>
             }
+         
+            <UploadFile handleFileData={handleFileData} />
+           
         </Paper>
 	)
 }

@@ -7,21 +7,20 @@ import Typography from '@material-ui/core/Typography';
 
 const styles = {
   container: {
-    margin: '40px'
+    position: "absolute",
+    right: "20px",
+    display: 'flex',
+    alignItems: 'center',
   },
   input: {
     display: 'none',
   },
   button: {
-    width: '300px',
-    borderRadius: '20px',
-    backgroundColor: 'rgb(70, 70, 70)',
-      '&:hover': {
-        backgroundColor: 'green'
-      }
+    backgroundColor: 'rgb(80, 164, 80)',
   },
   filename: {
-      marginTop: '30px'
+    fontSize: '12px',
+    marginRight: '10px',
   },
 };
 
@@ -118,7 +117,12 @@ const UploadFile = ( { handleFileData }) => {
 
   // RENDER
   return (
-    <div style={styles.container}>
+    <div class="center" style={styles.container}>
+
+        <Typography style={styles.filename} >
+          {filename}
+        </Typography>
+
         <Input
           style={styles.input}
           id="contained-button-file"
@@ -127,13 +131,11 @@ const UploadFile = ( { handleFileData }) => {
           onChange={handleFileUpload}
         />
         <label htmlFor="contained-button-file">
-          <Button variant="contained" color="primary" component="span" style={styles.button}>
+          <Button variant="contained" color="primary" size="small" component="span" style={styles.button}>
             Upload File
           </Button>
         </label>
-        <Typography variant="h5" gutterBottom style={styles.filename}>
-          {filename}
-        </Typography> 
+         
     </div>
   );
 }
