@@ -4,6 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import {LicenseManager} from "@ag-grid-enterprise/core";
+LicenseManager.setLicenseKey("your license key");
+
 ReactDOM.render(
   <React.StrictMode>
     <App />

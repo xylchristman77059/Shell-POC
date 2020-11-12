@@ -1,47 +1,76 @@
-import React from "react";
+import React, {useState, useCallback} from "react";
 
 import { AgGridReact } from 'ag-grid-react';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import { RowGroupingModule } from 'ag-grid-enterprise';
+import { AllModules } from '@ag-grid-enterprise/all-modules';
 
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-balham.css';
-import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
-import 'ag-grid-community/dist/styles/ag-theme-material.css';
+import '@ag-grid-community/all-modules/dist/styles/ag-grid.css';
+import '@ag-grid-community/all-modules/dist/styles/ag-theme-balham.css';
+import '@ag-grid-community/all-modules/dist/styles/ag-theme-balham-dark.css';
 
 const styles = {
     toolbar: {
-        padding: '10px',
         display: 'flex',
-        height: '15px',
-        alignItems: "center"
+        height: '40px',
+        alignItems: "center",
+        background: "#b3b3b3"
     },
     btnGroup: {
         position: "absolute",
-        right: "20px"
+        right: "40px"
     }
 };
   
-const AgGrid = ( {theme, data, filter} ) => {
+const AgGrid = ( {theme, data} ) => {
 
+    const [gridApi, setGridApi] = useState();
+    const [filters, setFilters] = useState();
+
+    // GROUP BY
+    const group = []; //"#PLANNING_CYCLE"];
+
+    // HIDDEN FIELDS
+    const hiddenColumns = [    
+        //"#PLANNING_CYCLE",
+        //"FORECAST_START_DATE",
+        //"FORECAST_END_DATE",
+        "FORECAST_TYPE",
+        "GSAP_ORG_CLASS",
+        "BUSINESS_UNIT",
+        "ORG_CLASS",
+        "GSAP_CONTRACT_NUM",
+        "GSAP_MOT_MOD",
+        "GSAP_PROPERTY_NUM",
+        //"GSAP_PRODUCT_CODE",
+        //"VOLUME",
+        "GSAP_UOM",
+        //"GSAP_PRODUCT_CODE_FINISHED",
+        //"VOLUME_FINISHED",
+        "GSAP_UOM_FINISHED",
+        "TME_SCE_VRS_DTE",
+        "SRC_PHY_SYS_ISC"
+    ];
+    
+    // ORIGINAL COLUMNS & ROWS
     const rows = data;
     const columns = Object.keys(data[0]);
+    console.log('columns & rows >>>', columns, rows);
 
+    // COLUMNS DEFS (ORIGINAL)
     const columnDefs = columns.map((column,i) => {
         return ({ 
             "headerName": column, 
-            "field": column, 
+            "field": column,         
+            "rowGroup": group.includes(column) ? true : false,
+            "hide": group.includes(column) || hiddenColumns.includes(column) ? true : false,
             "rowDrag": i===0 ? true : false,
             "checkboxSelection": i===0 ? true : false,
             "headerCheckboxSelection": i===0 ? true : false,
             "headerCheckboxSelectionFilteredOnly": true,
-            // "rowGroup": i===0 ? true : false,
         })
     });
-    console.log('columnDefs>>>', columnDefs);
+    // console.log('columnDefs>>>', columnDefs);
 
+    // DEFAULT COL DEFS
     const defaultColDef = {       
         "sortable": true, 
         "filter": true,
@@ -50,23 +79,78 @@ const AgGrid = ( {theme, data, filter} ) => {
         "resizable": true,
         "edit": true,            
         "sizeColumnToFit": true,
+        "enableRowGroup": true,
+        "enablePivot": true,
+        "enableValue": true,
+        //"menuTabs": ['generalMenuTab', 'filterMenuTab','columnsMenuTab']
     };
-    console.log('DefaultCol>>>', defaultColDef);
+    //console.log('defaultCol>>>', defaultColDef);
+
+    // NEW COLUMNS DEFS (INCLUDE THE NEW COLUMN)
+    const newColName = "$$$_SUM";
+    const newColDef = {
+        "headerName": newColName, 
+        "field": newColName,
+        "cellStyle": {'background-color': 'rgb(108, 185, 108)'}       
+    }
+    columnDefs.push(newColDef);
+    console.log('columnDefs>>>', columnDefs);
+
+    // NEW ROWS (INCLUDE THE NEW COLUMN)
+    const rowData = rows.map((row, i) => {
+        const value = Number(row.VOLUME) + Number(row.VOLUME_FINISHED);
+        return (
+            { ...row, [newColName]: value}
+        )
+    });
+    console.log('rowData>>>', rowData);
+
+    // ON GRID READY
+    const onGridReady = useCallback(
+        (params) => {
+          const { api, columnApi } = params;
+          setGridApi({ api, columnApi });
+        },
+        []
+    );
+    
+    // EXPORT EXCEL
+    const exportExcel = () => {
+        var params = {
+            exportMode: 'xlsx',
+            sheetName: 'ag-grid-export',
+            suppressTextAsCDATA: true,
+            allColumns: true,
+            columnKeys: columns,
+            columnWidth: 200,
+            rowHeight: 20,
+            headerRowHeight: 20,
+        };
+        gridApi.api.exportDataAsExcel(params);
+    };
+
+    const saveFilterModel = () => {
+        const savedFilterModel = gridApi.api.getFilterModel();
+        var keys = Object.keys(savedFilterModel);
+        var savedFilters = keys.length > 0 ? keys.join(', ') : '(none)';
+        setFilters(savedFilters);
+        console.log("savedFilters>>>", filters);
+//        document.querySelector('#savedFilters').innerHTML = savedFilters;
+      };
 
     const clearFilters = () => {
-        //gridApi.setFilterModel(null);
-        console.log('Clear Filters')
+        console.log('Clear Filters', gridApi)
+        saveFilterModel();
+        // gridApi.api.SetFilterModule(null);
+        // gridApi.api.clearFilters();
     }
 
     const restoreFilters = () => {
-        console.log('Restore Filters')
+        console.log('Restore Filters', gridApi)
+        saveFilterModel();
+        // gridApi.api.setFilterModule(filters);
+        // gridApi.api.restoreFilters();
     }
-
-    const destroyFilters = () => {
-        console.log('Destroy Filters')
-    }
-
-    //const modules = [ClientSideRowModelModule, RowGroupingModule];
 
 	return (
 		<div className={theme} style={{height: 600}}>
@@ -77,41 +161,29 @@ const AgGrid = ( {theme, data, filter} ) => {
                         Restore Filters
                     </button>
                     <button onClick={() => clearFilters()}>
-                        Reset Filters
+                        Clear Filters
                     </button>
-                    <button onClick={() => destroyFilters()}>
-                        Destroy Filters
+                    <button onClick={() => exportExcel()}>
+                        Export Excel
                     </button>
                 </div>
             </div>
 
             <AgGridReact 
+                modules={AllModules}
+
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
-                rowData={rows}
+                rowData={rowData}
+                //rowData={rows}
+                onGridReady={onGridReady}
+
                 rowSelection="multiple"
                 rowDragManaged={true}
                 animateRows={true}
-                suppressToolPanel={true}
-
-                groupSelectsChildren={true}
-                autoGroupColumnDef={{
-                    headerName: "Model",
-                    field: "model",
-                    cellRenderer:'agGroupCellRenderer',
-                    cellRendererParams: {
-                       checkbox: true
-                   }
-                }}
-
-                // Enterprise - Modules
-                // modules={modules}
-
-                // Enterprise - Row Details
-                //masterDetail={true}
-                //detailCellRendererParams={detailCellRendererParams}
                 
-                // Enterprise - Drag to Group
+                suppressToolPanel={true}
+            
                 suppressDragLeaveHidesColumns="true"
                 suppressMakeColumnVisibleAfterUnGroup="true"
                 rowGroupPanelShow="always"

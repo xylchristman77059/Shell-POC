@@ -18,7 +18,7 @@ const Header = () => {
             <div>
                 <img src="shell-logo.png" alt="logo" style={styles.logo} />
             </div>
-      </AppBar>
+        </AppBar>
 	)
 }
 export default Header;

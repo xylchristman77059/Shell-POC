@@ -1,28 +1,39 @@
 import React, {useState} from "react";
 import './App.css';
 
+// Hard code JSON 
+import jsonData from './files/data.json'
+
 // COMPONENTS
 import AppBar from './components/AppBar';
 import UploadFile from './components/UploadFile';
 import ToolBar from './components/ToolBar';
 import AgGrid from './components/AgGrid';
 import KendoGrid from './components/KendoGrid';
+import KendoSample from './components/KendoSample'
+
+const styles = {
+  grid: {
+    margin: '20px'
+  }
+}
 
 // MAIN APP
 function App() {
 
+  const fileUploadEnabled = false;
+
   // Used in FileUpload & Grids
-  const [data, setData] = useState([]);
-
+  const [data, setData] = useState( fileUploadEnabled ? [] : jsonData );
+  
   // Used in ToolBar.js
-  const [theme, setTheme] = useState("ag-theme-balham");
   const [grid, setGrid] = useState("ag");
-  const [search, setSearch] = useState("");
+  const [theme, setTheme] = useState("ag-theme-balham");
 
+  // Handle file upload
   const handleFileData = (data) => {
     if(data && data!=="undefined") {
       setData(data);
-      console.log('DATA>>>', data)
     }
   }
 
@@ -34,18 +45,17 @@ function App() {
     setTheme(newTheme);
   }
 
-  const handleSearchChange = (newSearch) => {
-    setTheme(newSearch);
-  }
-
   return (
     <div className="App">
 
       <AppBar />
-      <UploadFile handleFileData={handleFileData} />
+
+      { fileUploadEnabled && 
+        <UploadFile handleFileData={handleFileData} /> 
+      }
 
       { data.length !== 0 ?
-        <div>
+        <div style={styles.grid}>
           <ToolBar 
             grid={grid} 
             theme={theme} 
@@ -53,10 +63,11 @@ function App() {
             handleThemeChange = {handleThemeChange}
           />    
           {
-            grid === "ag" ? 
-              <AgGrid theme={theme} data={data} />
+            grid === "ag" ?  <AgGrid theme={theme} data={data} />
             :
-              <KendoGrid data={data} />
+            grid === "kendo" ? <KendoGrid data={data} />
+            :
+            <KendoSample />
           } 
         </div>
         :

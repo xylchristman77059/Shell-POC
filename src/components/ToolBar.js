@@ -19,8 +19,9 @@ const ToolBar = ({grid, theme, handleGridChange, handleThemeChange}) => {
               value={grid}
               onChange={(e)=>{ handleGridChange(e.target.value) }}
             >
-                <option value={"ag"}>Ag Grid React</option>
-                <option value={"kendo"}>Kendo Grid React</option>
+                <option value={"ag"}>Ag Grid</option>
+                <option value={"kendo"}>Kendo Grid</option>
+                <option value={"sample"}>Kendo Grid Sample</option>
             </select>
 
             { grid === "ag" ?
