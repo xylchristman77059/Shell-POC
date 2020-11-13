@@ -26,7 +26,7 @@ const AgGrid = ( {theme, data} ) => {
     const [gridApi, setGridApi] = useState();
     const [filters, setFilters] = useState();
 
-    // GROUP BY
+    // DEFAULT GROUPING
     const group = []; //"#PLANNING_CYCLE"];
 
     // HIDDEN FIELDS
@@ -59,39 +59,40 @@ const AgGrid = ( {theme, data} ) => {
     // COLUMNS DEFS (ORIGINAL)
     const columnDefs = columns.map((column,i) => {
         return ({ 
-            "headerName": column, 
-            "field": column,         
-            "rowGroup": group.includes(column) ? true : false,
-            "hide": group.includes(column) || hiddenColumns.includes(column) ? true : false,
-            "rowDrag": i===0 ? true : false,
-            "checkboxSelection": i===0 ? true : false,
-            "headerCheckboxSelection": i===0 ? true : false,
-            "headerCheckboxSelectionFilteredOnly": true,
+            headerName: column, 
+            field: column,         
+            rowGroup: group.includes(column) ? true : false,
+            hide: hiddenColumns.includes(column) ? true : false,
+            rowDrag: i===0 ? true : false,
+            // checkboxSelection: i===0 ? true : false,
+            headerCheckboxSelection: i===0 ? true : false,
+            headerCheckboxSelectionFilteredOnly: true,
+            cellRenderer: i===0 && 'agGroupCellRenderer',
         })
     });
     // console.log('columnDefs>>>', columnDefs);
 
     // DEFAULT COL DEFS
     const defaultColDef = {       
-        "sortable": true, 
-        "filter": true,
-        "floatingFilter": true,
-        "editable": true,
-        "resizable": true,
-        "edit": true,            
-        "sizeColumnToFit": true,
-        "enableRowGroup": true,
-        "enablePivot": true,
-        "enableValue": true,
+        sortable: true, 
+        filter: true,
+        floatingFilter: true,
+        editable: true,
+        resizable: true,
+        edit: true,            
+        sizeColumnToFit: true,
+        enableRowGroup: true,
+        enablePivot: true,
+        enableValue: true,
     };
-    //console.log('defaultCol>>>', defaultColDef);
+    //console.log('defaultColDef>>>', defaultColDef);
 
-    // NEW COLUMNS DEFS (INCLUDE THE CUSTOM COLUMN)
+    // NEW COLUMN DEFS (INCLUDE THE CUSTOM COLUMN)
     const newColName = "$$$_SUM";
     const newColDef = {
-        "headerName": newColName, 
-        "field": newColName,
-        "cellStyle": {'background-color': 'rgb(108, 185, 108)'}       
+        headerName: newColName, 
+        field: newColName,
+        cellStyle: {'background-color': 'rgb(108, 185, 108)'}       
     }
     columnDefs.push(newColDef);
     console.log('columnDefs>>>', columnDefs);
@@ -108,8 +109,12 @@ const AgGrid = ( {theme, data} ) => {
     // ON GRID READY
     const onGridReady = useCallback(
         (params) => {
-          const { api, columnApi } = params;
-          setGridApi({ api, columnApi });
+            // Save AgGrid APIs
+            const { api, columnApi } = params;
+            setGridApi({ api, columnApi });
+
+            // Close Tool Panel by default
+            api.closeToolPanel();
         },
         []
     );
@@ -133,8 +138,8 @@ const AgGrid = ( {theme, data} ) => {
     const saveFilters = () => {
         const filters = gridApi.api.getFilterModel();
         setFilters(filters);
-        // console.log("FILTERS>>>", filters);
-      };
+        // console.log("Save filters>>>", filters);
+    };
 
     const clearFilters = () => {
         saveFilters();
@@ -145,6 +150,33 @@ const AgGrid = ( {theme, data} ) => {
         gridApi.api.setFilterModel(filters)
     }
 
+    // DETAILS
+    const detailColDefs = hiddenColumns.map((column,i) => {
+        return ({ 
+            "headerName": column, 
+            "field": column,
+        })
+    });
+
+    const detailCellRendererParams = {
+        detailGridOptions: {
+            columnDefs: detailColDefs,
+            //defaultColDef: { flex: 1 },
+        },      
+        getDetailRowData: (params) => {
+            // params.data is the selected row data (exclude hidden columns)
+            params.successCallback(params.data.callRecords);
+        },
+    }
+
+    const onFirstDataRendered = (params) => {
+        // if want to expend a detail window by default
+        setTimeout( () => {
+            params.api.getDisplayedRowAtIndex(0).setExpanded(true);
+        }, 0);
+    };
+
+    // RENDER
 	return (
 		<div className={theme} style={{height: 600}}>
 
@@ -173,12 +205,17 @@ const AgGrid = ( {theme, data} ) => {
                 rowSelection="multiple"
                 rowDragManaged={true}
                 animateRows={true}
-                
-                suppressToolPanel={true}
             
-                suppressDragLeaveHidesColumns="true"
-                suppressMakeColumnVisibleAfterUnGroup="true"
+                dragLeaveHidesColumns={true}
+                makeColumnVisibleAfterUnGroup={true}
                 rowGroupPanelShow="always"
+
+                masterDetail={true}
+                detailCellRendererParams={detailCellRendererParams}
+                // onFirstDataRendered={onFirstDataRendered}
+
+                sideBar={true}
+                hiddenByDefault={true}    
             />
         </div>
 	)
