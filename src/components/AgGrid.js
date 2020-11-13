@@ -130,26 +130,19 @@ const AgGrid = ( {theme, data} ) => {
     };
 
     // FILTERING
-    const saveFilterModel = () => {
-        const savedFilterModel = gridApi.api.getFilterModel();
-        var keys = Object.keys(savedFilterModel);
-        var savedFilters = keys.length > 0 ? keys.join(', ') : '(none)';
-        setFilters(savedFilters);
-        console.log("savedFilters>>>", filters);
-//        document.querySelector('#savedFilters').innerHTML = savedFilters;
+    const saveFilters = () => {
+        const filters = gridApi.api.getFilterModel();
+        setFilters(filters);
+        // console.log("FILTERS>>>", filters);
       };
 
     const clearFilters = () => {
-        console.log('Clear Filters', gridApi)
-        gridApi.api.SetFilterModule(null);
-        // gridApi.api.clearFilters();
+        saveFilters();
+        gridApi.api.setFilterModel(null);
     }
 
     const restoreFilters = () => {
-        console.log('Restore Filters', gridApi)
-        saveFilterModel();
-        // gridApi.api.setFilterModule(filters);
-        // gridApi.api.restoreFilters();
+        gridApi.api.setFilterModel(filters)
     }
 
 	return (
