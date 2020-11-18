@@ -12,8 +12,8 @@ const styles = {
         display: 'flex',
         height: '40px',
         alignItems: "center",
-        background: "aliceblue",
-        border: 'solid 1px #bdc3c7',
+        background: "#555555",
+        //border: 'solid 1px #bdc3c7',
     },
     btnGroup: {
         position: "absolute",
@@ -27,7 +27,7 @@ const AgGrid = ( {theme, data} ) => {
     const [filters, setFilters] = useState();
 
     // DEFAULT GROUPING
-    const group = []; //"#PLANNING_CYCLE"];
+    const group = ["#PLANNING_CYCLE", "GSAP_PROPERTY_NUM", "GSAP_PRODUCT_CODE"];
 
     // HIDDEN FIELDS
     const hiddenColumns = [    
@@ -40,14 +40,14 @@ const AgGrid = ( {theme, data} ) => {
         "ORG_CLASS",
         "GSAP_CONTRACT_NUM",
         "GSAP_MOT_MOD",
-        "GSAP_PROPERTY_NUM",
+        //"GSAP_PROPERTY_NUM",
         //"GSAP_PRODUCT_CODE",
         //"VOLUME",
         "GSAP_UOM",
         //"GSAP_PRODUCT_CODE_FINISHED",
         //"VOLUME_FINISHED",
         "GSAP_UOM_FINISHED",
-        "TME_SCE_VRS_DTE",
+        //"TME_SCE_VRS_DTE",
         "SRC_PHY_SYS_ISC"
     ];
     
@@ -64,7 +64,7 @@ const AgGrid = ( {theme, data} ) => {
             rowGroup: group.includes(column) ? true : false,
             hide: hiddenColumns.includes(column) ? true : false,
             rowDrag: i===0 ? true : false,
-            // checkboxSelection: i===0 ? true : false,
+            checkboxSelection: i===0 ? true : false,
             headerCheckboxSelection: i===0 ? true : false,
             headerCheckboxSelectionFilteredOnly: true,
             cellRenderer: i===0 && 'agGroupCellRenderer',
@@ -114,10 +114,22 @@ const AgGrid = ( {theme, data} ) => {
             setGridApi({ api, columnApi });
 
             // Close Tool Panel by default
-            api.closeToolPanel();
+            // api.closeToolPanel();
         },
         []
     );
+
+    const onFirstDataRendered = (params) => {
+        setTimeout( () => {
+            // Expand the default detail panel
+            // params.api.getDisplayedRowAtIndex(0).setExpanded(true);
+
+            // Close Tool Panel by default
+            gridApi.api.closeToolPanel();
+
+
+        }, 0);
+    };
     
     // EXPORT EXCEL
     const exportExcel = () => {
@@ -169,13 +181,6 @@ const AgGrid = ( {theme, data} ) => {
         },
     }
 
-    const onFirstDataRendered = (params) => {
-        // if want to expend a detail window by default
-        setTimeout( () => {
-            params.api.getDisplayedRowAtIndex(0).setExpanded(true);
-        }, 0);
-    };
-
     // RENDER
 	return (
 		<div className={theme} style={{height: 600}}>
@@ -201,6 +206,7 @@ const AgGrid = ( {theme, data} ) => {
                 defaultColDef={defaultColDef}
                 rowData={rowData}
                 onGridReady={onGridReady}
+                onFirstDataRendered={onFirstDataRendered}
 
                 rowSelection="multiple"
                 rowDragManaged={true}
@@ -212,7 +218,8 @@ const AgGrid = ( {theme, data} ) => {
 
                 masterDetail={true}
                 detailCellRendererParams={detailCellRendererParams}
-                // onFirstDataRendered={onFirstDataRendered}
+
+                enableCharts={true}
 
                 sideBar={true}
                 hiddenByDefault={true}    

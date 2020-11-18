@@ -15,6 +15,9 @@ const KendoGrid = ( {data} ) => {
     const [gridClickedRow, setGridClickedRow] = useState({});
     const [windowVisible, setWindowVisible] = useState(false);
 
+    // DEFAULT GROUPING
+    const group = ["#PLANNING_CYCLE", "GSAP_PROPERTY_NUM", "GSAP_PRODUCT_CODE"];
+
     //const rows = data;
     const columns = Object.keys(data[0]);
     console.log('Columns >>>', columns)

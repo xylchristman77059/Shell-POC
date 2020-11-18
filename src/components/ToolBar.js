@@ -21,7 +21,9 @@ const ToolBar = ({grid, theme, handleGridChange, handleThemeChange, handleFileDa
               value={grid}
               onChange={(e)=>{ handleGridChange(e.target.value) }}
             >
+                <option value={"material"}>Material-UI</option>
                 <option value={"ag"}>Ag Grid</option>
+                <option value={"agcommunity"}>Ag Community</option>
                 <option value={"kendo"}>Kendo Grid</option>
                 <option value={"sample"}>Kendo Grid Sample</option>
             </select>
