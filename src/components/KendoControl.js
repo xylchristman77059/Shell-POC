@@ -13,18 +13,20 @@ const styles = {
         marginBottom: '15px',
     },
     container: {
-        padding: '15px 20px',
+        padding: '10px 20px',
         display: 'flex',
         // display: 'inline-flex', (Dates?)
     },
-    label: {
+    dateLabel: {
         fontSize: '12px',
-        margin: '0px 5px 10px'
+        marginLeft: '5px'
+    },
+    grpLabel: {
+        fontSize: '12px',
+        margin: '10px 25px 0px'
     },
     btn: {
         fontSize: '11px',
-        height: '35px',
-        marginRight: '5px'
     },
 };
 
@@ -33,14 +35,11 @@ const KendoControl = ( props ) => {
 	return (
         <div>
             <Paper style={styles.root}>              
-                <GridAndFile props={props} />
+                    <GridAndFile props={props} />
                 <Divider/>
-                <DropdownFilters/>
-                <DatePickerFilters/>
-            </Paper>
-
-            <Paper style={styles.root}>
-                <Grouping/>
+                    <DropdownFilters/>
+                    <DatePickerFilters/>               
+                    <Grouping/>
             </Paper>
         </div>
 	)
@@ -135,6 +134,7 @@ const DropdownFilters = () => {
     )
 };
 
+
 // Filter by dates
 const DatePickerFilters = () => {
     const options = ['Planning Cycle', 'Forecast Start', 'Forecast End'];
@@ -147,15 +147,15 @@ const DatePickerFilters = () => {
     return (
         <div style={styles.container}> 
             <div>
-                <p style={styles.label}>Planning Cycle</p>
+                <p style={styles.dateLabel}>Planning Cycle</p>
                 <DatePicker format="MM/dd/yyyy" formatPlaceholder="formatPattern" />
             </div>
             <div>
-                <p style={styles.label}>Forecast Start</p>
+                <p style={styles.dateLabel}>Forecast Start</p>
                 <DatePicker format="MM/dd/yyyy" formatPlaceholder="formatPattern" />
             </div>
             <div>
-                <p style={styles.label}>Forecast End</p>
+                <p style={styles.dateLabel}>Forecast End</p>
                 <DatePicker format="MM/dd/yyyy" formatPlaceholder="formatPattern" />
             </div>
         </div>
@@ -165,14 +165,26 @@ const DatePickerFilters = () => {
 // Default grouping
 const Grouping = () => {
     const groups = ["ORG_CLASS", "GSAP_PROPERTY_NUM", "GSAP_PRODUCT_CODE_FINISHED", "FORECAST_START_DATE"];
+    const grpLength = groups.length-1;
     return (
-        <div style={styles.container}>
-            <div>
-                <p style={styles.label}>Grouping</p>
-                { groups.map((group) => {
-                    return <Button style={styles.btn}>{group}</Button>
+        <div>
+            <p style={styles.grpLabel}>Grouping</p>
+            <div style={styles.container}>
+                
+                { groups.map((group, i) => {
+                    return (
+                        <div>
+                            <Button style={styles.btn}>{group}</Button>
+                            { i < grpLength && 
+                                <span key={i}
+                                    className='k-icon k-i-arrow-chevron-right'
+                                    style={{color: '#656565'}}
+                                />
+                            }
+                        </div>
+                    )
                 })}
-            </div>      
+            </div>
         </div>
     )
 }

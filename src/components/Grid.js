@@ -15,9 +15,9 @@ import jsonData from '../files/data.json'
 const useStyles = makeStyles((theme) => ({
     main: {
         flexGrow: 1,
-        backgroundColor: '#e3e3e3',
+        backgroundColor: '#b1b1b1',
         padding: theme.spacing(3),
-        height: '100vh',
+        height: '100%',
         width: '1px'
     },
 }));
