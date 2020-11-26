@@ -2,76 +2,66 @@ import React, {useState} from 'react';
 
 import { process } from '@progress/kendo-data-query';
 import { Grid, GridColumn } from '@progress/kendo-react-grid';
-import { Window } from '@progress/kendo-react-dialogs';
 
-import '@progress/kendo-theme-default/dist/all.css';
+import '@progress/kendo-theme-material/dist/all.css';
 
 const KendoGrid = ( {data} ) => {
+    
+    const initState = {   
+        skip: 0, 
+        take: 10,
+        sort: [],
+        group: [
+            {field: "ORG_CLASS"},
+            {field: "GSAP_PROPERTY_NUM"},
+            {field: "GSAP_PRODUCT_CODE_FINISHED"},
+            {field: "FORECAST_START_DATE"}
+        ]
+    }
+    const [dataState, setDataState]= useState(initState);
 
-    const [gridDataState, setGridDataState]= useState({ 
-        sort: [], 
-        page: { skip: 0, take: 10 }
-    });
-    const [gridClickedRow, setGridClickedRow] = useState({});
-    const [windowVisible, setWindowVisible] = useState(false);
-
-    // DEFAULT GROUPING
-    const group = ["#PLANNING_CYCLE", "GSAP_PROPERTY_NUM", "GSAP_PRODUCT_CODE"];
-
-    //const rows = data;
     const columns = Object.keys(data[0]);
-    console.log('Columns >>>', columns)
+    const headers = columns.map((column,i) => {
+        return <GridColumn field={column} title={column} width="200px" key={i}/>
+    });
+    
+    const dataStateChange = (event) => {
+        setDataState(event.dataState);
+        //console.log('dateStateChange>>>', event.dataState)
+    }
 
-    const handleGridDataStateChange = (e) => {
-        setGridDataState(e.data);
-    };
-      
-    const handleGridRowClick = (e) => {
-        setWindowVisible(true);
-        setGridClickedRow(e.dataItem);
-    };
-      
-    const closeWindow = (e) => {
-        setWindowVisible(false);
-    };
+    const pageChange = (event) => {
+        setDataState({
+            ...dataState,        
+            skip: event.page.skip,
+            take: event.page.take,
+        });
+        //console.log('pageChange>>>', dataState)
+    }
 
 	return (
-        <div className="kendo-grid" style={{ height: "600px" }}>
-            <Grid
-                data={process(data, gridDataState)}
-                pageable={true}
-                sortable={true}
-                filterable={true}
-                groupable={true}
-                reorderable={true}
-                {...gridDataState}
-                onDataStateChange={handleGridDataStateChange}            
-                onRowClick={handleGridRowClick}
-            >
-                {
-                    columns.map((column,i) => {
-                        return <GridColumn field={column} title={column} width="200px" key={i}/>
-                    })
-                }
-            </Grid>
-              
-            { windowVisible &&
-                <Window
-                    title="Details"
-                    onClose={closeWindow}
-                    height={300}
-                >
-                    <dl>
-                        <dt>Product Name</dt>
-                        <dd>{gridClickedRow.ProductName}</dd>
-                        <dt>Product ID</dt>
-                        <dd>{gridClickedRow.ProductID}</dd>
-                        <dt>Quantity per Unit</dt>
-                        <dd>{gridClickedRow.QuantityPerUnit}</dd>
-                    </dl>
-                </Window>
-            }             
-        </div>
+        <Grid
+            style={{ height: '100%' }}
+            data={process(data, dataState)}
+            onDataStateChange={dataStateChange}
+            {...dataState}
+
+            sortable 
+            resizable 
+            reorderable
+            //filterable 
+            //groupable
+            //serverFiltering
+
+            //pageable={{ pageSizes: true }}      
+            //scrollable="virtual"
+            //skip={dataState.skip}
+            //take={dataState.take}
+            //total={data.length}
+            //onPageChange={pageChange}
+        >
+            {headers}
+        </Grid>
 	)
 }
 export default KendoGrid;

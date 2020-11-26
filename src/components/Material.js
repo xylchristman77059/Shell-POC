@@ -20,7 +20,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import Icon from '@material-ui/core/Icon';
 import FaceIcon from '@material-ui/icons/Face';
-import Grouping from '@material-ui/icons/LineStyle';
+import GroupIcon from '@material-ui/icons/LineStyle';
 
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -114,7 +114,7 @@ const Material = ( {theme, data} ) => {
     console.log('NEW_FORECAST_START_DATE>>>', columns, rows)
 
 
-    // GROUP ROW BY COLUMNS
+    // GROUP ROWS BY COLUMNS
     const groupBy = (arr, fields) => {
 
         let field = fields[0]        
@@ -227,50 +227,9 @@ const Material = ( {theme, data} ) => {
         setPage(0);
     };
 
-    // GROUPING
-    const groupChips = () => (
-        <Paper style={styles.toolbar}>
-            <Grouping style={styles.grpIcon} />
-            {groups.map((group) => {
-                return (
-                    <div key={group}>
-                        <Chip
-                            // icon={<FaceIcon />}
-                            label={group}                               
-                            style={styles.chip}
-                            size="small"
-                            onDelete={handleGroupDelete}
-                        />
-                    </div>
-                );
-            })}
-        </Paper>
-    )
-
-    const handleGroupDelete = (data) => {
-
-    }
-
     // RENDER
 	return (
-        <Paper >
-            <Paper style={styles.toolbar}>
-                <Grouping style={styles.grpIcon} />
-                {groups.map((group) => {
-                    return (
-                        <div key={group}>
-                            <Chip
-                                // icon={<FaceIcon />}
-                                label={group}                               
-                                style={styles.chip}
-                                size="small"
-                                onDelete={handleGroupDelete}
-                            />
-                        </div>
-                    );
-                })}
-            </Paper>
-        
+        <Paper >    
             <TableContainer>
                 <Table stickyHeader size="small" aria-label="sticky table">
                     <TableHead>

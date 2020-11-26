@@ -27,7 +27,7 @@ const AgGrid = ( {theme, data} ) => {
     const [filters, setFilters] = useState();
 
     // DEFAULT GROUPING
-    const group = ["#PLANNING_CYCLE", "GSAP_PROPERTY_NUM", "GSAP_PRODUCT_CODE"];
+    const group = ["ORG_CLASS", "GSAP_PROPERTY_NUM", "GSAP_PRODUCT_CODE_FINISHED", "FORECAST_START_DATE"];
 
     // HIDDEN FIELDS
     const hiddenColumns = [    
@@ -183,7 +183,7 @@ const AgGrid = ( {theme, data} ) => {
 
     // RENDER
 	return (
-		<div className={theme} style={{height: 600}}>
+		<div className={theme} style={{height: '100vh'}}>
 
             <div style={styles.toolbar}>
                 <div style={styles.btnGroup} >

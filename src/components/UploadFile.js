@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 const styles = {
   container: {
     position: "absolute",
-    right: "20px",
+    right: "40px",
     display: 'flex',
     alignItems: 'center',
   },
@@ -16,7 +16,7 @@ const styles = {
     display: 'none',
   },
   button: {
-    backgroundColor: 'rgb(80, 164, 80)',
+    fontSize: '12px',
   },
   filename: {
     fontSize: '12px',
@@ -117,7 +117,7 @@ const UploadFile = ( { handleFileData }) => {
 
   // RENDER
   return (
-    <div class="center" style={styles.container}>
+    <div className="center" style={styles.container}>
 
         <Typography style={styles.filename} >
           {filename}
@@ -131,7 +131,7 @@ const UploadFile = ( { handleFileData }) => {
           onChange={handleFileUpload}
         />
         <label htmlFor="contained-button-file">
-          <Button variant="contained" color="primary" size="small" component="span" style={styles.button}>
+          <Button variant="contained" size="small" component="span" style={styles.button}>
             Upload File
           </Button>
         </label>
